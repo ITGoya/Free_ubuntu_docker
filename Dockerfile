@@ -7,8 +7,7 @@ RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies 
 RUN mkdir /var/run/sshd
 RUN sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-# پسورد دیگر داخل ایمیج نوشته نمی‌شود؛ هر کاربر موقع اجرا آن را
-# از طریق متغیر محیطی SSH_PASSWORD در پنل Railway (Variables) مشخص می‌کند.
+# از طریق متغیر محیطی SSH_PASSWORD در پنل Railway (Variables) مشخص کنید.
 ENV SSH_PASSWORD=changeme123
 RUN apt update -y && apt install -y dbus-x11 x11-utils x11-xserver-utils x11-apps
 RUN apt install software-properties-common -y
