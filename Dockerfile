@@ -1,7 +1,14 @@
 FROM --platform=linux/amd64 ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies tigervnc-standalone-server novnc websockify sudo xterm init systemd snapd vim net-tools curl wget git tzdata
+RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies tigervnc-standalone-server novnc websockify sudo xterm init systemd snapd vim net-tools curl wget git tzdata openssh-server
+
+# --- SSH setup ---
+RUN mkdir /var/run/sshd
+# رمز عبور رندوم برای کاربر root (این رو یادداشت کن، جایی دیگه نمایش داده نمیشه)
+RUN echo 'root:DvNF1p9AEAjwlhiw9ikUCNGF' | chpasswd
+RUN sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 RUN apt update -y && apt install -y dbus-x11 x11-utils x11-xserver-utils x11-apps
 RUN apt install software-properties-common -y
 RUN add-apt-repository ppa:mozillateam/ppa -y
@@ -14,4 +21,5 @@ RUN apt update -y && apt install -y xubuntu-icon-theme
 RUN touch /root/.Xauthority
 EXPOSE 5901
 EXPOSE 6080
-CMD bash -c "vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
+EXPOSE 22
+CMD bash -c "service ssh start && vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
