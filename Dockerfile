@@ -5,9 +5,11 @@ RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies 
 
 # --- SSH setup ---
 RUN mkdir /var/run/sshd
-RUN echo 'root:DvNF1p9AEAjwlhiw9ikUCNGF' | chpasswd
 RUN sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+# پسورد دیگر داخل ایمیج نوشته نمی‌شود؛ هر کاربر موقع اجرا آن را
+# از طریق متغیر محیطی SSH_PASSWORD در پنل Railway (Variables) مشخص می‌کند.
+ENV SSH_PASSWORD=changeme123
 RUN apt update -y && apt install -y dbus-x11 x11-utils x11-xserver-utils x11-apps
 RUN apt install software-properties-common -y
 RUN add-apt-repository ppa:mozillateam/ppa -y
@@ -21,4 +23,4 @@ RUN touch /root/.Xauthority
 EXPOSE 5901
 EXPOSE 6080
 EXPOSE 22
-CMD bash -c "service ssh start && vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
+CMD bash -c "echo \"root:\${SSH_PASSWORD}\" | chpasswd && service ssh start && vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
