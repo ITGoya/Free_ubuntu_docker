@@ -5,7 +5,6 @@ RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies 
 
 # --- SSH setup ---
 RUN mkdir /var/run/sshd
-# رمز عبور رندوم برای کاربر root (این رو یادداشت کن، جایی دیگه نمایش داده نمیشه)
 RUN echo 'root:DvNF1p9AEAjwlhiw9ikUCNGF' | chpasswd
 RUN sed -i 's/#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed -i 's/#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
